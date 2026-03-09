@@ -47,23 +47,16 @@ public interface TaskApi {
                     Retourne la liste complète des tâches de l'utilisateur connecté.
                     
                     Le paramètre `done` permet de filtrer par statut d'achèvement.
-                    """,
-            security = @SecurityRequirement(name = "BearerAuth")
+                    """
     )
     @ApiResponse(
             responseCode = "200",
             description = "Liste récupérée avec succès",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = TaskResponse.class)
-            )
-    )
-    @ApiResponse(
-            responseCode = "401",
-            description = "Non authentifié — token manquant ou expiré",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorDto.class)
+                    array = @io.swagger.v3.oas.annotations.media.ArraySchema(
+                            schema = @Schema(implementation = TaskResponse.class)
+                    )
             )
     )
     @GetMapping
@@ -87,8 +80,7 @@ public interface TaskApi {
      */
     @Operation(
             summary = "Récupérer une tâche",
-            description = "Retourne les détails d'une tâche identifiée par son ID.",
-            security = @SecurityRequirement(name = "BearerAuth")
+            description = "Retourne les détails d'une tâche identifiée par son ID."
     )
 
     @ApiResponse(
@@ -113,14 +105,6 @@ public interface TaskApi {
     @ApiResponse(
             responseCode = "404",
             description = "Tâche introuvable",
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorDto.class)
-            )
-    )
-    @ApiResponse(
-            responseCode = "401",
-            description = "Non authentifié",
             content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorDto.class)

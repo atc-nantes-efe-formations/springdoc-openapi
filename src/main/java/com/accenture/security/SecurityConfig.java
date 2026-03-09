@@ -1,5 +1,7 @@
 package com.accenture.security;
 
+import com.accenture.dto.ErrorDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -42,13 +44,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity   // active @PreAuthorize / @PostAuthorize sur les méthodes
 public class SecurityConfig {
 
+    private final ObjectMapper objectMapper;
+
+    public SecurityConfig(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     // =========================================================================
     // Filtre de sécurité
     // =========================================================================
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter)  {
+                                                   BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter) throws Exception {
         http
                 // Désactive CSRF — API REST stateless, pas de session navigateur
                 .csrf(AbstractHttpConfigurer::disable)
@@ -79,9 +87,18 @@ public class SecurityConfig {
 
                 // Pour éviter les redirections HTML
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) ->
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication required")
-                        )
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            ErrorDto error = ErrorDto.of(
+                                    HttpServletResponse.SC_UNAUTHORIZED,
+                                    "UNAUTHORIZED",
+                                    authException.getMessage(),
+                                    request.getRequestURI()
+                            );
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.setCharacterEncoding("UTF-8");
+                            objectMapper.writeValue(response.getWriter(), error);
+                        })
                 )
         ;
 
@@ -123,10 +140,6 @@ public class SecurityConfig {
         return new TokenAuthenticationService();
     }
 
-    @Bean
-    public BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter(TokenAuthenticationService tokenAuthenticationService) {
-        return new BearerTokenAuthenticationFilter(tokenAuthenticationService);
-    }
 
     @Bean
     public FilterRegistrationBean<BearerTokenAuthenticationFilter> bearerTokenFilterRegistration(BearerTokenAuthenticationFilter filter) {

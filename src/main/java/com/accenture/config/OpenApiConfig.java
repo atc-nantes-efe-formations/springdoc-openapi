@@ -1,6 +1,8 @@
 package com.accenture.config;
 
-import com.accenture.dto.ErrorDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -8,7 +10,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,19 +34,16 @@ public class OpenApiConfig {
     public OpenAPI taskManagerOpenAPI() {
         return new OpenAPI()
                 .info(apiInfo())
-                .addSecurityItem(new SecurityRequirement()
-                        .addList(BASIC_AUTH)
-                        .addList(BEARER_AUTH))
+                // Pas de .addSecurityItem() global : les GET sont publics,
+                // seuls les endpoints mutants déclarent @SecurityRequirement
                 .components(new Components()
-                        // Enregistre ErrorDto comme schéma réutilisable ($ref dans le JSON OpenAPI)
-                        .addSchemas("ErrorDto", new Schema<ErrorDto>().$ref("#/components/schemas/ErrorDto"))
-                        // Basic Auth — ex : Authorization: Basic dXNlcjpwYXNz
+                        // ErrorDto est découvert automatiquement via @Schema sur le record —
+                        // pas besoin de l'enregistrer manuellement ici
                         .addSecuritySchemes(BASIC_AUTH,
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("basic")
                                         .description("Identifiants basiques (username / password)"))
-                        // Bearer JWT — ex : Authorization: Bearer eyJhbGci...
                         .addSecuritySchemes(BEARER_AUTH, new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
@@ -100,6 +98,18 @@ public class OpenApiConfig {
                 .license(new License()
                         .name("Apache 2.0")
                         .url("https://www.apache.org/licenses/LICENSE-2.0"));
+    }
+
+    /**
+     * Bean ObjectMapper partagé — gère la sérialisation JSON des dates (JavaTimeModule)
+     * et est injecté dans {@code SecurityConfig} pour écrire les réponses d'erreur.
+     */
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return mapper;
     }
 
 }
