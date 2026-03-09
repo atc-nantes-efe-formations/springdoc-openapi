@@ -1,11 +1,11 @@
-# Support de cours — OpenAPI & Swagger avec Spring Boot
+# Support de cours - OpenAPI & Swagger avec Spring Boot
 
 > **Stack** : Spring Boot 4.0.3 · Java 25 · springdoc-openapi 3.0.2  
-> **Projet démo** : `Task Manager API` — CRUD de tâches en mémoire  
+> **Projet démo** : `Task Manager API` - CRUD de tâches en mémoire  
 > **Légende des niveaux** :  
-> 🟢 **Débutant** — comprendre à quoi ça sert  
-> 🟡 **Intermédiaire** — comprendre comment ça fonctionne  
-> 🔴 **Avancé** — aller plus loin, bonnes pratiques
+> 🟢 **Débutant** - comprendre à quoi ça sert  
+> 🟡 **Intermédiaire** - comprendre comment ça fonctionne  
+> 🔴 **Avancé** - aller plus loin, bonnes pratiques
 
 ---
 
@@ -22,18 +22,18 @@
 9. [Authentification](#9-authentification)
 10. [Gestion des erreurs](#10-gestion-des-erreurs)
 11. [Bonnes pratiques & erreurs fréquentes](#11-bonnes-pratiques--erreurs-fréquentes)
-12. [Le fichier OpenAPI — JSON, YAML & génération de code](#12-le-fichier-openapi--json-yaml--génération-de-code)
+12. [Le fichier OpenAPI - JSON, YAML & génération de code](#12-le-fichier-openapi--json-yaml--génération-de-code)
 13. [Conclusion](#13-conclusion)
 
 ---
 
 ## 1. Qu'est-ce que c'est ? À quoi ça sert ?
 
-### 🟢 OpenAPI — le contrat
+### 🟢 OpenAPI - le contrat
 
 **OpenAPI** (anciennement *Swagger Specification*) est une **spécification standard** pour décrire une API REST sous forme de fichier structuré (JSON ou YAML).
 
-> Pensez-y comme un **plan d'architecte** pour votre API : il décrit tous les endpoints, les paramètres attendus, les réponses possibles et les règles de sécurité — indépendamment de tout langage de programmation.
+> Pensez-y comme un **plan d'architecte** pour votre API : il décrit tous les endpoints, les paramètres attendus, les réponses possibles et les règles de sécurité - indépendamment de tout langage de programmation.
 
 Ce fichier est lisible par des humains **et** par des machines.
 
@@ -47,7 +47,7 @@ Votre API Spring Boot
    Swagger UI          ──►  /swagger-ui.html  (interface web)
 ```
 
-### 🟢 Swagger UI — l'interface
+### 🟢 Swagger UI - l'interface
 
 **Swagger UI** est une **interface web** générée automatiquement qui permet de :
 
@@ -55,7 +55,7 @@ Votre API Spring Boot
 - 🧪 **Tester** les endpoints directement dans le navigateur (sans Postman)
 - 🤝 **Partager** le contrat avec les équipes front-end, QA, partenaires
 
-### 🟢 springdoc — l'intégration Spring Boot
+### 🟢 springdoc - l'intégration Spring Boot
 
 **springdoc-openapi** est la bibliothèque qui fait le pont entre votre code Spring Boot et la spec OpenAPI. Elle :
 
@@ -133,12 +133,12 @@ OpenAPI vit **exclusivement dans la couche adaptateur REST**. C'est la règle d'
 |---------|-------------------------------|
 | `TaskApi.java` (interface) | ✅ Toutes : `@Tag`, `@Operation`, `@ApiResponse`, `@Parameter`... |
 | `TaskController.java` (impl) | ✅ Aucune (sauf `@RestController`) |
-| `TaskService.java` | ❌ Interdit — couche service |
+| `TaskService.java` | ❌ Interdit - couche service |
 | `TaskRequest/Response/ErrorDto` (DTO) | ✅ `@Schema` uniquement |
 | `OpenApiConfig.java` (config) | ✅ Configuration programmatique OpenAPI |
-| `I18nConfig.java` (config) | ❌ Aucune — config technique pure |
-| `SecurityConfig.java` (config) | ❌ Aucune — config technique pure |
-| `Task.java` (entité JPA) | ❌ Interdit — couche domaine |
+| `I18nConfig.java` (config) | ❌ Aucune - config technique pure |
+| `SecurityConfig.java` (config) | ❌ Aucune - config technique pure |
+| `Task.java` (entité JPA) | ❌ Interdit - couche domaine |
 
 ### 🔴 Architecture hexagonale
 
@@ -343,7 +343,7 @@ TaskService.java      ← Logique métier + validation, aucune annotation OpenAP
 ### 🟡 Interface annotée
 
 ```java
-// TaskApi.java — le contrat
+// TaskApi.java - le contrat
 @Tag(name = "Tâches", description = "Opérations CRUD sur les tâches")
 @RequestMapping("/api/tasks")
 public interface TaskApi {
@@ -360,10 +360,10 @@ public interface TaskApi {
 }
 ```
 
-### 🟡 Controller — délégation pure
+### 🟡 Controller - délégation pure
 
 ```java
-// TaskController.java — aucune logique, aucune annotation OpenAPI
+// TaskController.java - aucune logique, aucune annotation OpenAPI
 @RestController
 public class TaskController implements TaskApi {
 
@@ -386,10 +386,10 @@ public class TaskController implements TaskApi {
 }
 ```
 
-### 🟡 Service — logique + validation
+### 🟡 Service - logique + validation
 
 ```java
-// TaskService.java — tout ce qui n'est pas HTTP
+// TaskService.java - tout ce qui n'est pas HTTP
 @Service
 public class TaskService {
 
@@ -431,7 +431,7 @@ src/main/java/com/accenture/controller/
 
 ## 6. Annotations OpenAPI côté endpoints
 
-### 🟢 `@Tag` — Regrouper les endpoints
+### 🟢 `@Tag` - Regrouper les endpoints
 
 ```java
 @Tag(
@@ -444,7 +444,7 @@ public interface TaskApi { ... }
 
 > `@Tag` sur l'interface regroupe tous les endpoints sous le même onglet dans Swagger UI.
 
-### 🟢 `@Operation` — Décrire un endpoint
+### 🟢 `@Operation` - Décrire un endpoint
 
 ```java
 @Operation(
@@ -456,7 +456,7 @@ public interface TaskApi { ... }
 ResponseEntity<TaskResponse> createTask(...);
 ```
 
-### 🟡 `@ApiResponse` / `@ApiResponses` — Documenter les réponses
+### 🟡 `@ApiResponse` / `@ApiResponses` - Documenter les réponses
 
 ```java
 @ApiResponses({
@@ -481,7 +481,7 @@ ResponseEntity<TaskResponse> createTask(...);
 
 > Documenter **aussi les erreurs** avec le vrai schéma `ErrorDto` est une bonne pratique essentielle.
 
-### 🟡 `@Parameter` — Décrire les paramètres
+### 🟡 `@Parameter` - Décrire les paramètres
 
 ```java
 // Path parameter
@@ -505,7 +505,7 @@ ResponseEntity<TaskResponse> createTask(...);
 @RequestParam(required = false) Boolean done
 ```
 
-### 🟡 `@RequestBody` OpenAPI — Décrire le corps de la requête
+### 🟡 `@RequestBody` OpenAPI - Décrire le corps de la requête
 
 > Attention : il y a **deux** `@RequestBody` :
 > - `io.swagger.v3.oas.annotations.parameters.RequestBody` → pour la documentation
@@ -533,7 +533,7 @@ ResponseEntity<TaskResponse> createTask(...);
 @org.springframework.web.bind.annotation.RequestBody TaskRequest request  // ← Spring MVC
 ```
 
-### 🔴 `@SecurityRequirement` — Sécuriser un endpoint
+### 🔴 `@SecurityRequirement` - Sécuriser un endpoint
 
 ```java
 @Operation(
@@ -544,7 +544,7 @@ ResponseEntity<TaskResponse> createTask(...);
 ResponseEntity<List<TaskResponse>> getAllTasks(...);
 ```
 
-> Sur les endpoints d'écriture (POST, PUT, DELETE), les deux schémas sont listés — l'un **ou** l'autre suffit :
+> Sur les endpoints d'écriture (POST, PUT, DELETE), les deux schémas sont listés - l'un **ou** l'autre suffit :
 
 ```java
 @Operation(
@@ -561,7 +561,7 @@ ResponseEntity<Void> deleteTask(@PathVariable Long id);
 
 > ⚠️ `security = {}` sur `@Operation` **remplace** le `addSecurityItem` global pour cet endpoint. Il faut donc lister **tous** les schémas acceptés.
 
-### 🔴 `@Schema(hidden = true)` — Masquer le body d'une réponse 204
+### 🔴 `@Schema(hidden = true)` - Masquer le body d'une réponse 204
 
 Pour un `DELETE` qui retourne `204 No Content`, on masque explicitement le body dans Swagger UI :
 
@@ -573,7 +573,7 @@ Pour un `DELETE` qui retourne `204 No Content`, on masque explicitement le body 
 )
 ```
 
-### 🔴 `@ExampleObject` — Fournir des exemples nommés
+### 🔴 `@ExampleObject` - Fournir des exemples nommés
 
 ```java
 @ApiResponse(
@@ -639,7 +639,7 @@ public record TaskRequest(
 ) {}
 ```
 
-### 🟡 DTO de réponse — `accessMode`
+### 🟡 DTO de réponse - `accessMode`
 
 ```java
 public record TaskResponse(
@@ -672,7 +672,7 @@ public record TaskResponse(
 ) {}
 ```
 
-### 🟡 DTO d'erreur — `ErrorDto`
+### 🟡 DTO d'erreur - `ErrorDto`
 
 Toutes les erreurs de l'API (4xx, 5xx) partagent **le même format** grâce à `ErrorDto` :
 
@@ -725,7 +725,7 @@ public record ErrorDto(
 
 ## 8. Headers HTTP
 
-### 🟢 `Accept-Language` — au-delà de la documentation
+### 🟢 `Accept-Language` - au-delà de la documentation
 
 `Accept-Language` est un header HTTP standard que Swagger UI documente **et** que Spring utilise réellement pour adapter les messages de réponse à la langue du client.
 
@@ -744,7 +744,7 @@ Requête  →  Accept-Language: es
         messages_es.properties       →  "El título de la tarea no puede estar vacío"
 ```
 
-### 🟡 Configuration i18n — `I18nConfig`
+### 🟡 Configuration i18n - `I18nConfig`
 
 ```java
 @Configuration
@@ -815,7 +815,7 @@ public class TaskControllerAdvice {
 
     private final MessageSource messageSource;
 
-    // Méthode utilitaire — locale lue depuis LocaleContextHolder (alimenté par AcceptHeaderLocaleResolver)
+    // Méthode utilitaire - locale lue depuis LocaleContextHolder (alimenté par AcceptHeaderLocaleResolver)
     private String msg(String key, Object... args) {
         return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
     }
@@ -880,7 +880,7 @@ public class GlobalHeadersConfig {
                 new Parameter()
                     .in("header")
                     .name("Accept-Language")
-                    .description("Langue préférée (fr, en, es) — pilote la langue des messages d'erreur")
+                    .description("Langue préférée (fr, en, es) - pilote la langue des messages d'erreur")
                     .required(false)
                     .example("fr")
                     .schema(new StringSchema()._default("fr"))
@@ -925,19 +925,19 @@ public OpenAPI taskManagerOpenAPI() {
                     .addList("basicAuth")
                     .addList("BearerAuth"))
             .components(new Components()
-                    // Basic Auth — Authorization: Basic dXNlcjpwYXNz
+                    // Basic Auth - Authorization: Basic dXNlcjpwYXNz
                     .addSecuritySchemes("basicAuth",
                             new SecurityScheme()
                                     .type(SecurityScheme.Type.HTTP)
                                     .scheme("basic")
                                     .description("Identifiants basiques (username / password)"))
-                    // Bearer token — Authorization: Bearer <token>
+                    // Bearer token - Authorization: Bearer <token>
                     .addSecuritySchemes("BearerAuth",
                             new SecurityScheme()
                                     .type(SecurityScheme.Type.HTTP)
                                     .scheme("bearer")
                                     .bearerFormat("JWT")
-                                    .description("Token Bearer — format : `Bearer <token>`"))
+                                    .description("Token Bearer - format : `Bearer <token>`"))
             );
 }
 ```
@@ -1012,7 +1012,7 @@ public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
 }
 ```
 
-Le service de résolution des tokens est simple — une `Map` token → `UserDetails` :
+Le service de résolution des tokens est simple - une `Map` token → `UserDetails` :
 
 ```java
 @Service
@@ -1098,7 +1098,7 @@ Sans mécanisme dédié, chaque controller gère ses erreurs différemment : cer
 
 > La solution : **un format d'erreur unique**, **une exception métier**, **un gestionnaire centralisé**.
 
-### 🟢 L'exception métier — `TaskException`
+### 🟢 L'exception métier - `TaskException`
 
 Une exception `RuntimeException` qui porte son propre code HTTP et un code d'erreur lisible :
 
@@ -1133,7 +1133,7 @@ throw TaskException.notFound(id);          // → 404 TASK_NOT_FOUND
 throw TaskException.badRequest("...");     // → 400 TASK_BAD_REQUEST
 ```
 
-### 🟢 Le DTO d'erreur — `ErrorDto`
+### 🟢 Le DTO d'erreur - `ErrorDto`
 
 **Un seul format** pour toutes les erreurs de l'API, documenté avec `@Schema` :
 
@@ -1160,7 +1160,7 @@ Exemple de réponse JSON que le client recevra :
 }
 ```
 
-### 🟡 Le gestionnaire centralisé — `@RestControllerAdvice`
+### 🟡 Le gestionnaire centralisé - `@RestControllerAdvice`
 
 `@RestControllerAdvice` intercepte toutes les exceptions levées par n'importe quel controller et les transforme en `ErrorDto`. **Un seul endroit** pour toute la gestion d'erreur :
 
@@ -1209,7 +1209,7 @@ public class TaskControllerAdvice {
                                   request.getRequestURI()));
     }
 
-    // 5. Fallback — tout ce qui n'est pas prévu → 500 (message interne non exposé)
+    // 5. Fallback - tout ce qui n'est pas prévu → 500 (message interne non exposé)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDto> handleGeneric(Exception ignored, HttpServletRequest request) {
         return ResponseEntity.internalServerError()
@@ -1234,14 +1234,14 @@ Requête HTTP  →  TaskController  →  TaskService.validate()  →  throw Task
 ```
 
 ```java
-// TaskController — aucune validation, délégation totale
+// TaskController - aucune validation, délégation totale
 @Override
 public ResponseEntity<TaskResponse> createTask(TaskRequest request) {
     TaskResponse created = taskService.create(request);   // la validation est dans le service
     return ResponseEntity.created(URI.create("/api/tasks/" + created.id())).body(created);
 }
 
-// TaskService — toute la validation
+// TaskService - toute la validation
 public TaskResponse create(TaskRequest request) {
     validate(request);   // ← validation ici
     // persistence...
@@ -1272,7 +1272,7 @@ Chaque endpoint de `TaskApi` documente ses réponses d'erreur avec le schéma `E
     @ApiResponse(responseCode = "401", description = "Non authentifié",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErrorDto.class)))
-    // 500 est ajouté automatiquement par OpenApiCustomizer — pas besoin de le répéter
+    // 500 est ajouté automatiquement par OpenApiCustomizer - pas besoin de le répéter
 })
 @GetMapping("/{id}")
 ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id);
@@ -1293,10 +1293,10 @@ ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id);
 ### 🔴 Pourquoi ne pas exposer le message interne sur les 500 ?
 
 ```java
-// ❌ Dangereux — expose la stacktrace ou des détails internes
+// ❌ Dangereux - expose la stacktrace ou des détails internes
 return ErrorDto.of(500, "INTERNAL_ERROR", ex.getMessage(), path);
 
-// ✅ Correct — message générique, erreur loguée côté serveur
+// ✅ Correct - message générique, erreur loguée côté serveur
 log.error("Erreur interne sur {}", path, ex);
 return ErrorDto.of(500, "INTERNAL_ERROR",
         "Une erreur interne est survenue. Veuillez réessayer ultérieurement.", path);
@@ -1320,10 +1320,10 @@ Un message d'erreur interne peut révéler la structure de la base de données, 
 
 ### 🟡 Erreurs fréquentes
 
-#### ❌ Erreur 1 — Validation dans le controller
+#### ❌ Erreur 1 - Validation dans le controller
 
 ```java
-// ❌ MAUVAIS — le controller valide
+// ❌ MAUVAIS - le controller valide
 @Override
 public ResponseEntity<TaskResponse> createTask(TaskRequest request) {
     if (request.title() == null || request.title().isBlank()) {
@@ -1334,7 +1334,7 @@ public ResponseEntity<TaskResponse> createTask(TaskRequest request) {
 ```
 
 ```java
-// ✅ CORRECT — le controller délègue, le service valide
+// ✅ CORRECT - le controller délègue, le service valide
 @Override
 public ResponseEntity<TaskResponse> createTask(TaskRequest request) {
     TaskResponse created = taskService.create(request);   // la validation est dans le service
@@ -1342,10 +1342,10 @@ public ResponseEntity<TaskResponse> createTask(TaskRequest request) {
 }
 ```
 
-#### ❌ Erreur 2 — Annotations OpenAPI sur l'implémentation
+#### ❌ Erreur 2 - Annotations OpenAPI sur l'implémentation
 
 ```java
-// ❌ MAUVAIS — annotations sur le controller
+// ❌ MAUVAIS - annotations sur le controller
 @RestController
 @Tag(name = "Tâches")  // ← ici c'est faux
 public class TaskController implements TaskApi {
@@ -1357,7 +1357,7 @@ public class TaskController implements TaskApi {
 ```
 
 ```java
-// ✅ CORRECT — annotations sur l'interface
+// ✅ CORRECT - annotations sur l'interface
 @Tag(name = "Tâches")
 public interface TaskApi {
 
@@ -1366,7 +1366,7 @@ public interface TaskApi {
 }
 ```
 
-#### ❌ Erreur 3 — Confondre les deux `@RequestBody`
+#### ❌ Erreur 3 - Confondre les deux `@RequestBody`
 
 ```java
 // ❌ Mauvaise importation
@@ -1385,7 +1385,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;  // OpenAPI
 TaskRequest request
 ```
 
-#### ❌ Erreur 4 — Ne documenter que les succès
+#### ❌ Erreur 4 - Ne documenter que les succès
 
 ```java
 // ❌ Incomplet
@@ -1403,7 +1403,7 @@ TaskRequest request
 })
 ```
 
-#### ❌ Erreur 5 — Exposer les détails d'une erreur 500
+#### ❌ Erreur 5 - Exposer les détails d'une erreur 500
 
 ```java
 // ❌ Dangereux
@@ -1417,7 +1417,7 @@ body(ErrorDto.of(500, "INTERNAL_ERROR", "Une erreur interne est survenue.", path
 ### 🔴 Checklist avant livraison
 
 - [ ] Tous les endpoints ont un `@Operation` avec `summary` et `description`
-- [ ] Tous les codes de réponse sont documentés (`2xx`, `4xx`) — le `500` est global via `OpenApiCustomizer`
+- [ ] Tous les codes de réponse sont documentés (`2xx`, `4xx`) - le `500` est global via `OpenApiCustomizer`
 - [ ] Les réponses d'erreur utilisent `@Schema(implementation = ErrorDto.class)` (pas `hidden = true`)
 - [ ] Chaque paramètre a un `description` et un `example`
 - [ ] Les champs des DTO ont tous un `@Schema` avec `description` et `example`
@@ -1440,7 +1440,7 @@ OpenAPI documente **ce que l'API fait**, il ne décide pas **ce qu'elle devrait 
 
 ---
 
-## 12. Le fichier OpenAPI — JSON, YAML & génération de code
+## 12. Le fichier OpenAPI - JSON, YAML & génération de code
 
 ### 🟢 Le fichier produit par springdoc
 
@@ -1648,7 +1648,7 @@ openapi-generator-cli generate \
 ```
 
 Option `interfaceOnly=true` → génère uniquement les interfaces (le contrat), **pas l'implémentation**.  
-Vous n'avez plus qu'à écrire `TaskController implements TaskApi` — exactement le pattern de ce projet.
+Vous n'avez plus qu'à écrire `TaskController implements TaskApi` - exactement le pattern de ce projet.
 
 #### Via le plugin Maven (intégré au build)
 
@@ -1711,7 +1711,7 @@ openapi-generator-cli list
                         → doit correspondre au YAML source
 ```
 
-> ⚠️ En Design First, le fichier YAML est la **source de vérité**. Le code généré ne doit **jamais être modifié à la main** — il sera écrasé à la prochaine génération. Seule l'implémentation (`TaskController`) est écrite manuellement.
+> ⚠️ En Design First, le fichier YAML est la **source de vérité**. Le code généré ne doit **jamais être modifié à la main** - il sera écrasé à la prochaine génération. Seule l'implémentation (`TaskController`) est écrite manuellement.
 
 ---
 
@@ -1733,7 +1733,7 @@ openapi-generator-cli list
 | Configuration | Bean `OpenAPI` pour titre/version/sécurité + `OpenApiCustomizer` pour le 500 global |
 | Interface | Contrat dans l'interface, controller = délégation, service = logique |
 | Annotations | `@Tag`, `@Operation`, `@ApiResponse`, `@Parameter`, `@SecurityRequirement` |
-| DTO | `@Schema` sur record/classe — `TaskRequest`, `TaskResponse`, `ErrorDto` |
+| DTO | `@Schema` sur record/classe - `TaskRequest`, `TaskResponse`, `ErrorDto` |
 | Headers & i18n | `Accept-Language` documenté dans Swagger **et** branché sur `AcceptHeaderLocaleResolver` → messages traduits (fr/en/es) |
 | Auth | `basicAuth` + `BearerAuth` déclarés dans `OpenApiConfig`, bouton Authorize dans Swagger UI |
 | Erreurs | `TaskException` (clé i18n) + `ErrorDto` + `@RestControllerAdvice` + résolution `MessageSource` |
@@ -1765,8 +1765,8 @@ openapi-generator-cli list
                           (Pact, Schemathesis)
 ```
 
-> Le vrai pouvoir d'OpenAPI n'est pas la page de documentation jolie — c'est la **génération automatique** de clients, de tests et de mocks à partir d'un seul source de vérité.
+> Le vrai pouvoir d'OpenAPI n'est pas la page de documentation jolie - c'est la **génération automatique** de clients, de tests et de mocks à partir d'un seul source de vérité.
 
 ---
 
-*Support de cours rédigé pour le projet `01-openapi` — Spring Boot 4.0.3 · Java 25 · springdoc 3.0.2*
+*Support de cours rédigé pour le projet `01-openapi` - Spring Boot 4.0.3 · Java 25 · springdoc 3.0.2*
