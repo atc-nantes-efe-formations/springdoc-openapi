@@ -132,7 +132,7 @@ OpenAPI vit **exclusivement dans la couche adaptateur REST**. C'est la règle d'
 | Fichier | Annotations OpenAPI autorisées |
 |---------|-------------------------------|
 | `TaskApi.java` (interface) | ✅ Toutes : `@Tag`, `@Operation`, `@ApiResponse`, `@Parameter`... |
-| `TaskController.java` (impl) | ✅ Aucune (sauf `@RestController`) |
+| `TaskController.java` (impl) | ✅ `@RestController`, `@RequestMapping`, `@GetMapping`... (mapping HTTP) |
 | `TaskService.java` | ❌ Interdit — couche service |
 | `TaskRequest/Response/ErrorDto` (DTO) | ✅ `@Schema` uniquement |
 | `OpenApiConfig.java` (config) | ✅ Configuration programmatique OpenAPI |
@@ -357,15 +357,12 @@ TaskService.java      ← Logique métier + validation, aucune annotation OpenAP
 ```java
 // TaskApi.java — le contrat
 @Tag(name = "Tâches", description = "Opérations CRUD sur les tâches")
-@RequestMapping("/api/tasks")
 public interface TaskApi {
 
     @Operation(summary = "Lister toutes les tâches")
-    @GetMapping
     ResponseEntity<List<TaskResponse>> getAllTasks(@RequestParam(required = false) Boolean done);
 
     @Operation(summary = "Créer une tâche")
-    @PostMapping
     ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest request);
     
     // ...
@@ -375,8 +372,9 @@ public interface TaskApi {
 ### 🟡 Controller — délégation pure
 
 ```java
-// TaskController.java — aucune logique, aucune annotation OpenAPI
+// TaskController.java — mapping HTTP ici, aucune annotation OpenAPI
 @RestController
+@RequestMapping("/api/tasks")
 public class TaskController implements TaskApi {
 
     private final TaskService taskService;
@@ -386,11 +384,13 @@ public class TaskController implements TaskApi {
     }
 
     @Override
+    @GetMapping
     public ResponseEntity<List<TaskResponse>> getAllTasks(Boolean done) {
         return ResponseEntity.ok(taskService.findAll(done));
     }
 
     @Override
+    @PostMapping
     public ResponseEntity<TaskResponse> createTask(TaskRequest request) {
         TaskResponse created = taskService.create(request);
         return ResponseEntity.created(URI.create("/api/tasks/" + created.id())).body(created);
@@ -932,14 +932,6 @@ public class GlobalHeadersConfig {
 
 > 🔴 **Ce header a un effet réel** : Spring lit `Accept-Language`, résout la locale via `AcceptHeaderLocaleResolver`, et tous les messages d'erreur sont retournés dans la langue demandée.
 
-### 🔴 Comparaison des approches
-
-| Approche | Quand l'utiliser |
-|----------|-----------------|
-| `@Parameter(in = HEADER)` sur l'interface | Header spécifique à un endpoint |
-| `OperationCustomizer` global | Header transverse à toute l'API (traçabilité, langue) |
-| `@RequestHeader` Spring MVC | Pour lire le header dans le code (indépendant de la doc) |
-
 ---
 
 ## 9. Authentification
@@ -1421,24 +1413,34 @@ public ResponseEntity<TaskResponse> createTask(TaskRequest request) {
 #### ❌ Erreur 2 — Annotations OpenAPI sur l'implémentation
 
 ```java
-// ❌ MAUVAIS — annotations sur le controller
+// ❌ MAUVAIS — annotations OpenAPI sur le controller
 @RestController
 @Tag(name = "Tâches")  // ← ici c'est faux
 public class TaskController implements TaskApi {
 
     @Operation(summary = "...")  // ← ici aussi
     @Override
+    @GetMapping
     public ResponseEntity<List<TaskResponse>> getAllTasks(Boolean done) { ... }
 }
 ```
 
 ```java
-// ✅ CORRECT — annotations sur l'interface
+// ✅ CORRECT — annotations OpenAPI sur l'interface, mapping HTTP sur le controller
 @Tag(name = "Tâches")
 public interface TaskApi {
 
     @Operation(summary = "...")
     ResponseEntity<List<TaskResponse>> getAllTasks(Boolean done);
+}
+
+@RestController
+@RequestMapping("/api/tasks")
+public class TaskController implements TaskApi {
+
+    @Override
+    @GetMapping
+    public ResponseEntity<List<TaskResponse>> getAllTasks(Boolean done) { ... }
 }
 ```
 
@@ -1469,13 +1471,13 @@ TaskRequest request
 
 // ✅ Complet
 @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Tâche trouvée",
-            content = @Content(schema = @Schema(implementation = TaskResponse.class))),
-    @ApiResponse(responseCode = "404", description = "Tâche introuvable",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class))),
-    @ApiResponse(responseCode = "401", description = "Non authentifié",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class)))
-    // 500 est ajouté automatiquement par OpenApiCustomizer
+        @ApiResponse(responseCode = "200", description = "Tâche trouvée",
+                content = @Content(schema = @Schema(implementation = TaskResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Tâche introuvable",
+                content = @Content(schema = @Schema(implementation = ErrorDto.class))),
+        @ApiResponse(responseCode = "401", description = "Non authentifié",
+                content = @Content(schema = @Schema(implementation = ErrorDto.class)))
+        // 500 est ajouté automatiquement par OpenApiCustomizer — pas besoin de le répéter
 })
 ```
 
@@ -1486,7 +1488,7 @@ TaskRequest request
 body(ErrorDto.of(500, "INTERNAL_ERROR", ex.getMessage(), path));
 
 // ✅ Message générique côté client, log côté serveur
-log.error("Erreur interne sur {}", path, ex);
+        log.error("Erreur interne sur {}", path, ex);
 body(ErrorDto.of(500, "INTERNAL_ERROR", "Une erreur interne est survenue.", path));
 ```
 

@@ -32,7 +32,6 @@ import java.util.List;
         name = "Tâches",
         description = "Opérations CRUD sur les tâches de l'utilisateur connecté"
 )
-@RequestMapping("/api/tasks")
 public interface TaskApi {
 
     /**
