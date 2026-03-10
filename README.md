@@ -258,7 +258,7 @@ new Info()
         .name("Équipe Accenture")
         .email("dev@accenture.com")
         .url("https://accenture.com"))
-    .license(new License()
+        .license(new License()
         .name("Apache 2.0")
         .url("https://www.apache.org/licenses/LICENSE-2.0"))
 ```
@@ -328,6 +328,50 @@ public OpenApiCustomizer globalErrorResponses() {
 ```
 
 > 🔴 Le schéma `ErrorDto` est réutilisable car il est enregistré dans les `Components` via `addSchemas("ErrorDto", ...)`.
+
+### 🟡 Déclarer plusieurs serveurs cibles
+
+La spec OpenAPI permet de lister plusieurs serveurs (local, recette, production…). Swagger UI propose alors un sélecteur en haut de page pour basculer d'un environnement à l'autre, **sans changer de fichier**.
+
+```java
+@Bean
+public OpenAPI taskManagerOpenAPI() {
+    return new OpenAPI()
+            .info(apiInfo())
+            .servers(List.of(
+                    new Server()
+                            .url("http://localhost:8080")
+                            .description("Local"),
+                    new Server()
+                            .url("http://api-recette.example.com:8080")
+                            .description("Recette")
+            ))
+            .components(/* ... */);
+}
+```
+
+> 🟡 L'ordre de la liste est respecté : le premier serveur est sélectionné par défaut dans Swagger UI.
+
+Ce que cela donne dans le contrat YAML généré :
+
+```yaml
+servers:
+  - url: http://localhost:8080
+    description: Local
+  - url: http://api-recette.example.com:8080
+    description: Recette
+```
+
+**Cas d'usage typiques :**
+
+| Environnement | URL type |
+|---|---|
+| Développement local | `http://localhost:8080` |
+| Recette / QA | `https://api-recette.mon-projet.com` |
+| Pré-production | `https://api-preprod.mon-projet.com` |
+| Production | `https://api.mon-projet.com` |
+
+> ⚠️ Ne pas exposer l'URL de production dans la doc Swagger si elle est accessible publiquement — filtrez par profil Spring (`@Profile`) si nécessaire.
 
 ---
 
@@ -1471,13 +1515,13 @@ TaskRequest request
 
 // ✅ Complet
 @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Tâche trouvée",
-                content = @Content(schema = @Schema(implementation = TaskResponse.class))),
-        @ApiResponse(responseCode = "404", description = "Tâche introuvable",
-                content = @Content(schema = @Schema(implementation = ErrorDto.class))),
-        @ApiResponse(responseCode = "401", description = "Non authentifié",
-                content = @Content(schema = @Schema(implementation = ErrorDto.class)))
-        // 500 est ajouté automatiquement par OpenApiCustomizer — pas besoin de le répéter
+    @ApiResponse(responseCode = "200", description = "Tâche trouvée",
+            content = @Content(schema = @Schema(implementation = TaskResponse.class))),
+    @ApiResponse(responseCode = "404", description = "Tâche introuvable",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class))),
+    @ApiResponse(responseCode = "401", description = "Non authentifié",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class)))
+    // 500 est ajouté automatiquement par OpenApiCustomizer — pas besoin de le répéter
 })
 ```
 
