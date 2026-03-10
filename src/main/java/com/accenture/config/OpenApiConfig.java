@@ -11,18 +11,21 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
  * Configuration globale de la documentation OpenAPI.
  *
- * <p>🟢 Débutant : ce bean génère la page d'accueil de Swagger UI
+ * <p>Débutant : ce bean génère la page d'accueil de Swagger UI
  *     (titre, version, description).</p>
- * <p>🟡 Intermédiaire : on y déclare les schémas de sécurité réutilisables
+ * <p>Intermédiaire : on y déclare les schémas de sécurité réutilisables
  *     dans tout le contrat.</p>
- * <p>🔴 Avancé : on peut y ajouter des servers, extensions x-*, tags globaux,
+ * <p>Avancé : on peut y ajouter des servers, extensions x-*, tags globaux,
  *     etc.</p>
  */
 @Configuration
@@ -35,7 +38,13 @@ public class OpenApiConfig {
     public OpenAPI taskManagerOpenAPI() {
         return new OpenAPI()
                 .info(apiInfo())
-
+                .servers(List.of(
+                        new Server()
+                                .url("http://localhost:8080")
+                                .description("Local"),
+                        new Server()
+                                .url("http://api-recette.example.com:8080")
+                                .description("Recette")))
                 // Applique BearerAuth et basicAuth sur TOUS les endpoints par défaut
 //                .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH))
 //                .addSecurityItem(new SecurityRequirement().addList(BASIC_AUTH))
