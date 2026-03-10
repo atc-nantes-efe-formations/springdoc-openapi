@@ -1,10 +1,12 @@
 package com.accenture.controller.impl;
 
 import com.accenture.controller.TaskApi;
+
 import com.accenture.dto.TaskRequest;
 import com.accenture.dto.TaskResponse;
 import com.accenture.service.TaskService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -43,6 +45,7 @@ public class TaskController implements TaskApi {
 
     @Override
     @PostMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<TaskResponse> createTask(
             @org.springframework.web.bind.annotation.RequestBody TaskRequest request) {
         TaskResponse created = taskService.create(request);
@@ -51,6 +54,7 @@ public class TaskController implements TaskApi {
 
     @Override
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<TaskResponse> updateTask(
             @PathVariable Long id,
             @org.springframework.web.bind.annotation.RequestBody TaskRequest request) {
@@ -59,6 +63,7 @@ public class TaskController implements TaskApi {
 
     @Override
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.delete(id);
         return ResponseEntity.noContent().build();

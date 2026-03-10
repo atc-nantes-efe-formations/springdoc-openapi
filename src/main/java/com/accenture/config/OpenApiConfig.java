@@ -9,6 +9,7 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -34,11 +35,12 @@ public class OpenApiConfig {
     public OpenAPI taskManagerOpenAPI() {
         return new OpenAPI()
                 .info(apiInfo())
-                // Pas de .addSecurityItem() global : les GET sont publics,
-                // seuls les endpoints mutants déclarent @SecurityRequirement
+
+                // Applique BearerAuth et basicAuth sur TOUS les endpoints par défaut
+//                .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH))
+//                .addSecurityItem(new SecurityRequirement().addList(BASIC_AUTH))
+
                 .components(new Components()
-                        // ErrorDto est découvert automatiquement via @Schema sur le record —
-                        // pas besoin de l'enregistrer manuellement ici
                         .addSecuritySchemes(BASIC_AUTH,
                                 new SecurityScheme()
                                         .type(SecurityScheme.Type.HTTP)
@@ -88,8 +90,9 @@ public class OpenApiConfig {
                         
                         Permet de **créer**, **lire**, **modifier** et **supprimer** des tâches.
                         
-                        > ⚠️ Cette API est protégée : vous devez fournir un Bearer token
-                        > ou des identifiants Basic pour accéder aux endpoints sécurisés.
+                        Cette API est protégée : vous devez fournir
+                        - un Bearer token
+                        - ou des identifiants Basic pour accéder aux endpoints sécurisés.
                         """)
                 .contact(new Contact()
                         .name("Équipe Accenture")

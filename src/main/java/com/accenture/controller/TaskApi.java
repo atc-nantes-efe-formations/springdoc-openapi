@@ -58,7 +58,6 @@ public interface TaskApi {
                     )
             )
     )
-    @GetMapping
     ResponseEntity<List<TaskResponse>> getAllTasks(
 
             @Parameter(
@@ -110,7 +109,6 @@ public interface TaskApi {
             )
     )
 
-    @GetMapping("/{id}")
     ResponseEntity<TaskResponse> getTaskById(
 
             @Parameter(
@@ -170,8 +168,6 @@ public interface TaskApi {
                     schema = @Schema(implementation = ErrorDto.class)
             )
     )
-    @PostMapping
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     ResponseEntity<TaskResponse> createTask(
 
             @RequestBody(
@@ -227,8 +223,6 @@ public interface TaskApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErrorDto.class)))
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     ResponseEntity<TaskResponse> updateTask(
 
             @Parameter(name = "id", description = "ID de la tâche à modifier",
@@ -265,8 +259,6 @@ public interface TaskApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = ErrorDto.class)))
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<Void> deleteTask(
 
             @Parameter(name = "id", description = "ID de la tâche à supprimer",
